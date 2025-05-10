@@ -7,21 +7,21 @@ export class User {
     description: 'id пользователя',
     example: '1',
   })
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'integer' })
   id: number;
 
   @ApiProperty({
     description: 'Почта пользователя',
     example: 'user@example.com',
   })
-  @Column({ type: 'string', unique: true, nullable: false })
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
   email: string;
 
   @ApiProperty({
     description: 'Пароль пользователя',
     example: '1234',
   })
-  @Column({ type: 'string', nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   password: string;
 
   @ApiProperty({
@@ -36,6 +36,6 @@ export class User {
     example: 'Нарушение правил',
     required: false,
   })
-  @Column({ type: 'string', nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   banReason: string;
 }
