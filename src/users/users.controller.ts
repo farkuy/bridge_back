@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { User } from './users.entity';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -19,6 +20,7 @@ export class UsersController {
   }
 
   @Get('all')
+  @UseGuards(AuthGuard)
   @ApiResponse({
     status: 201,
     description: 'Список пользователей',
