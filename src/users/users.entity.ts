@@ -1,5 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '../roles/roles.entity';
 
 @Entity()
 export class User {
@@ -38,4 +45,8 @@ export class User {
   })
   @Column({ type: 'varchar', length: 500, nullable: true })
   banReason: string;
+
+  @ManyToMany(() => Role, (role) => role.users, { cascade: true })
+  @JoinTable()
+  roles: Role[];
 }

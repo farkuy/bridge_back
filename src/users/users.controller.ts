@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { User } from './users.entity';
 import { AuthGuard } from '../auth/auth.guard';
+import { AddRoleDto } from './dto/add-role.dto';
 
 @Controller('users')
 export class UsersController {
@@ -30,19 +31,24 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
-  @Get()
-  @ApiQuery({
-    name: 'email',
-    type: String,
-    description: 'Email пользователя',
-    required: true,
-  })
+  @Get(':id')
   @ApiResponse({
     status: 201,
     description: 'Пользователь успешно найден',
     type: User,
   })
-  getUserByEmail(@Body() email: string) {
-    return this.usersService.getUserByEmail(email);
+  getUserById(@Param('id') id: number) {
+    return this.usersService.getUserById(id);
+  }
+
+  @Post('addRole')
+  @ApiBody({ type: AddRoleDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Пользователю успешно добавлена роль',
+    type: User,
+  })
+  addRole(@Body() dto: AddRoleDto) {
+    return this.usersService.addRole(dto);
   }
 }
