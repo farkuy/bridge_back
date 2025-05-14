@@ -1,15 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/user.dto';
 import { AddRoleDto } from './dto/add-role.dto';
 import { RolesService } from '../roles/roles.service';
 import { UsersRepository } from './user.repository';
-import { User } from './users.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
     private usersRepository: UsersRepository,
     private rolesService: RolesService,
   ) {}
@@ -31,6 +28,7 @@ export class UsersService {
   async addRole(addRoleDto: AddRoleDto) {
     const role = await this.rolesService.getRoleByValue(addRoleDto.value);
     const user = await this.usersRepository.findById(addRoleDto.userId);
+
     if (!user) throw new NotFoundException('Пользователь не найден');
     if (user.roles.find((activeRole) => activeRole.value === role.value)) {
       throw new NotFoundException('У пользователя имеется такая роль');
