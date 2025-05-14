@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
-import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiResponse } from '@nestjs/swagger';
 import { User } from './users.entity';
 import { AuthGuard } from '../auth/auth.guard';
 import { AddRoleDto } from './dto/add-role.dto';

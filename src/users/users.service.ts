@@ -1,127 +1,59 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { User } from './users.entity';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/user.dto';
 import { AddRoleDto } from './dto/add-role.dto';
 import { RolesService } from '../roles/roles.service';
+import { UsersRepository } from './user.repository';
+import { User } from './users.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private usersRepository: UsersRepository,
     private rolesService: RolesService,
   ) {}
 
   async createUser(userDto: CreateUserDto) {
-    try {
-      const newUser = await this.usersRepository.create(userDto);
+    const newUser = await this.usersRepository.createUser(userDto);
 
-      const role = await this.rolesService.getRoleByValue('USER');
-      newUser.roles = [role];
+    const role = await this.rolesService.getRoleByValue('USER');
+    newUser.roles = [role];
 
-      await this.usersRepository.save(newUser);
-      return newUser;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при создании пользователя',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    await this.usersRepository.createUser(newUser);
+    return newUser;
   }
 
   async getAllUsers() {
-    try {
-      const users = await this.usersRepository.find();
-      return users;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при создании пользователя',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.usersRepository.findAll();
   }
 
   async addRole(addRoleDto: AddRoleDto) {
-    try {
-      const role = await this.rolesService.getRoleByValue(addRoleDto.value);
-      const user = await this.getUserById(addRoleDto.userId);
-      if (
-        user.roles &&
-        user.roles.find((activeRole) => activeRole.value === role.value)
-      )
-        throw new HttpException(
-          'У пользователя имеется такая роль',
-          HttpStatus.BAD_REQUEST,
-        );
-      if (user.roles) user.roles.push(role);
-      else user.roles = [role];
-
-      await this.usersRepository.save(user);
-      return user;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при добавлении роли пользователю',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    const role = await this.rolesService.getRoleByValue(addRoleDto.value);
+    const user = await this.usersRepository.findById(addRoleDto.userId);
+    if (!user) throw new NotFoundException('Пользователь не найден');
+    if (user.roles.find((activeRole) => activeRole.value === role.value)) {
+      throw new NotFoundException('У пользователя имеется такая роль');
     }
+
+    if (user.roles) user.roles.push(role);
+    else user.roles = [role];
+
+    await this.usersRepository.save(user);
+    return user;
   }
 
   async getUserById(id: number) {
-    try {
-      const user = await this.usersRepository.findOne({
-        where: { id },
-        relations: ['roles'],
-      });
-      if (!user)
-        throw new HttpException(
-          'Пользователь не найден',
-          HttpStatus.BAD_REQUEST,
-        );
+    const user = await this.usersRepository.findById(id);
+    if (!user) throw new NotFoundException('Пользователь не найден');
 
-      return user;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при поиске пользователя',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return user;
   }
 
   async getUserByEmail(email: string) {
-    try {
-      const user = await this.usersRepository.findOne({
-        where: { email },
-        relations: ['roles'],
-      });
-      if (!user)
-        throw new HttpException(
-          'Пользователь не найден',
-          HttpStatus.BAD_REQUEST,
-        );
+    const user = await this.usersRepository.findByEmail(email);
+    if (!user) throw new NotFoundException('Пользователь не найден');
 
-      return user;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при поиске пользователя',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return user;
   }
 }
