@@ -6,10 +6,13 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { Role } from './roles/roles.entity';
+import { TokensService } from './tokens/tokens.service';
+import { TokensController } from './tokens/tokens.controller';
+import { TokensModule } from './tokens/tokens.module';
 
 @Module({
-  controllers: [],
-  providers: [],
+  controllers: [TokensController],
+  providers: [TokensService],
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
@@ -25,6 +28,7 @@ import { Role } from './roles/roles.entity';
     UsersModule,
     AuthModule,
     RolesModule,
+    TokensModule,
   ],
 })
 export class AppModule {}

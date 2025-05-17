@@ -3,10 +3,12 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../roles/roles.entity';
+import { Token } from '../tokens/token.entity';
 
 @Entity()
 export class User {
@@ -49,4 +51,7 @@ export class User {
   @ManyToMany(() => Role, (role) => role.users, { cascade: true })
   @JoinTable()
   roles: Role[];
+
+  @OneToOne(() => Token, (tokens) => tokens.user)
+  refreshToken: Token;
 }
