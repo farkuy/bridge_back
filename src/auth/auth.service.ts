@@ -1,18 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dto/user.dto';
-import { User } from '../users/users.entity';
+import { CreateUserDto, UserDto } from '../users/dto/user.dto';
 import * as bcrypt from 'bcrypt';
+import { TokensService } from '../tokens/tokens.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService,
+    private tokenService: TokensService,
   ) {}
 
-  async registration(createUserDto: CreateUserDto) {
+  async registration(createUserDto: CreateUserDto): Promise<UserDto> {
     const user = await this.usersService.getUserByEmail(createUserDto.email);
     if (user)
       throw new HttpException(
@@ -27,10 +26,15 @@ export class AuthService {
       password: secretPassword,
     });
 
-    return await this.generateToken(newUser);
+    const tokens = await this.tokenService.generateTokens(newUser);
+    await this.tokenService.saveToken(newUser.id, tokens.refreshToken);
+    return {
+      ...newUser,
+      ...tokens,
+    };
   }
 
-  async login(loginUserDto: CreateUserDto) {
+  async login(loginUserDto: CreateUserDto): Promise<UserDto> {
     const user = await this.usersService.getUserByEmail(loginUserDto.email);
     if (!user)
       throw new HttpException(
@@ -45,7 +49,12 @@ export class AuthService {
     if (!checkPassword)
       throw new HttpException('Не верный пароль', HttpStatus.FORBIDDEN);
 
-    return await this.generateToken(user);
+    const tokens = await this.tokenService.generateTokens(user);
+    await this.tokenService.saveToken(user.id, tokens.refreshToken);
+    return {
+      ...user,
+      ...tokens,
+    };
   }
 
   private async hashPassword(password: string): Promise<string> {
@@ -57,10 +66,5 @@ export class AuthService {
     hash: string,
   ): Promise<boolean> {
     return await bcrypt.compare(password, hash);
-  }
-
-  private async generateToken(user: User): Promise<string> {
-    const { password, ...other } = user;
-    return await this.jwtService.signAsync(other);
   }
 }

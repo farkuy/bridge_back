@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Token } from './token.entity';
+import { User } from '../users/users.entity';
 
 @Injectable()
 export class TokensRepository extends Repository<Token> {
@@ -8,11 +9,7 @@ export class TokensRepository extends Repository<Token> {
     super(Token, dataSource.createEntityManager());
   }
 
-  async findByUserId(id: number) {
-    return await this.findOne({ where: { user: id } });
-  }
-
-  async saveNewToken(token: string) {
-    return;
+  async findByUser(user: User) {
+    return await this.findOne({ where: { user } });
   }
 }

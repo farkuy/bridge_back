@@ -6,13 +6,12 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { Role } from './roles/roles.entity';
-import { TokensService } from './tokens/tokens.service';
-import { TokensController } from './tokens/tokens.controller';
 import { TokensModule } from './tokens/tokens.module';
+import { Token } from './tokens/token.entity';
 
 @Module({
-  controllers: [TokensController],
-  providers: [TokensService],
+  controllers: [],
+  providers: [],
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
@@ -22,7 +21,7 @@ import { TokensModule } from './tokens/tokens.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, Role],
+      entities: [User, Role, Token],
       synchronize: true,
     }),
     UsersModule,

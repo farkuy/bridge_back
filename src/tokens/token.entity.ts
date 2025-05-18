@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,7 +12,7 @@ import { User } from '../users/users.entity';
 @Entity()
 export class Token {
   @ApiProperty({
-    description: 'id',
+    description: 'id токена',
     example: '1',
   })
   @PrimaryGeneratedColumn({ type: 'integer' })
@@ -26,6 +27,6 @@ export class Token {
   refreshToken: string;
 
   @OneToOne(() => User, (user) => user.refreshToken, { cascade: true })
-  @JoinTable()
+  @JoinColumn()
   user: User;
 }
