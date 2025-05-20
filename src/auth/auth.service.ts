@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto, UserDto } from '../users/dto/user.dto';
+import { CreateUserDto } from '../users/dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { TokensService } from '../tokens/tokens.service';
 
@@ -11,13 +11,8 @@ export class AuthService {
     private tokenService: TokensService,
   ) {}
 
-  async registration(createUserDto: CreateUserDto): Promise<UserDto> {
-    const user = await this.usersService.getUserByEmail(createUserDto.email);
-    if (user)
-      throw new HttpException(
-        'Пользователь с такой почтной уже зарегестрирован',
-        HttpStatus.FORBIDDEN,
-      );
+  async registration(createUserDto: CreateUserDto) {
+    await this.usersService.isUserRegistration(createUserDto.email);
 
     const secretPassword = await this.hashPassword(createUserDto.password);
 
@@ -34,13 +29,8 @@ export class AuthService {
     };
   }
 
-  async login(loginUserDto: CreateUserDto): Promise<UserDto> {
+  async login(loginUserDto: CreateUserDto) {
     const user = await this.usersService.getUserByEmail(loginUserDto.email);
-    if (!user)
-      throw new HttpException(
-        'Пользователь с такой почтной не найден',
-        HttpStatus.FORBIDDEN,
-      );
 
     const checkPassword = await this.comparePassword(
       loginUserDto.password,
@@ -51,6 +41,7 @@ export class AuthService {
 
     const tokens = await this.tokenService.generateTokens(user);
     await this.tokenService.saveToken(user.id, tokens.refreshToken);
+
     return {
       ...user,
       ...tokens,

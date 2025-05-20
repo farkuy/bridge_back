@@ -17,7 +17,7 @@ export class UsersService {
     const role = await this.rolesService.getRoleByValue('USER');
     newUser.roles = [role];
 
-    await this.usersRepository.createUser(newUser);
+    await this.usersRepository.save(newUser);
     return newUser;
   }
 
@@ -53,5 +53,12 @@ export class UsersService {
     if (!user) throw new NotFoundException('Пользователь не найден');
 
     return user;
+  }
+
+  async isUserRegistration(email: string): Promise<boolean> {
+    const user = await this.usersRepository.findByEmail(email);
+    if (user)
+      throw new NotFoundException('Пользователь с такой почтой существует');
+    return false;
   }
 }
