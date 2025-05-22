@@ -13,6 +13,7 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(cookieParser());
+  app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
     .setTitle('Bridge')
