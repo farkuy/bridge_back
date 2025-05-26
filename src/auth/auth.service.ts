@@ -25,12 +25,14 @@ export class AuthService {
     await this.tokenService.saveToken(newUser.id, tokens.refreshToken);
     return {
       ...newUser,
+      roles: Object.values(newUser.roles),
       ...tokens,
     };
   }
 
   async login(loginUserDto: CreateUserDto) {
     const user = await this.usersService.getUserByEmail(loginUserDto.email);
+    console.log(user.roles);
 
     const checkPassword = await this.comparePassword(
       loginUserDto.password,
@@ -44,6 +46,7 @@ export class AuthService {
 
     return {
       ...user,
+      roles: Object.values(user.roles),
       ...tokens,
     };
   }

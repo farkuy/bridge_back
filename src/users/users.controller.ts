@@ -27,8 +27,8 @@ export class UsersController {
     description: 'Список пользователей',
     type: [User],
   })
-  getAllUsers() {
-    return this.usersService.getAllUsers();
+  async getAllUsers() {
+    return await this.usersService.getAllUsers();
   }
 
   @Get(':id')

@@ -17,7 +17,7 @@ export class TokensService {
     user: User,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const { password, ...other } = user;
-    const accessToken = this.jwtService.sign(other, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign(other, { expiresIn: '2s' });
     const refreshToken = this.jwtService.sign(other, { expiresIn: '30d' });
 
     return {

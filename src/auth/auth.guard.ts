@@ -7,15 +7,20 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { TokensService } from '../tokens/tokens.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private tokensService: TokensService,
+  ) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
+
     const authorizationHeader = request.headers.authorization;
     if (!authorizationHeader)
       throw new HttpException(
@@ -33,6 +38,8 @@ export class AuthGuard implements CanActivate {
       request.user = this.jwtService.verify(token);
       return true;
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+      }
       throw new UnauthorizedException({
         message: 'Не авторизованный пользователь',
       });

@@ -15,6 +15,7 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'Пользователь зарегестрирован',
+    type: UserResponseDto,
   })
   async registration(
     @Body() dto: CreateUserDto,
@@ -25,8 +26,9 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
+    console.log(other);
 
     return plainToInstance(UserResponseDto, other, {
       excludeExtraneousValues: true,
@@ -38,17 +40,18 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'Пользователь успешно зашел',
+    type: UserResponseDto,
   })
   async login(
     @Body() dto: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response<UserResponseDto>,
   ) {
     const { refreshToken, ...other } = await this.authService.login(dto);
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
     return plainToInstance(UserResponseDto, other, {
