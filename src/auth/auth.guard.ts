@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { TokensService } from '../tokens/tokens.service';
-import { response } from 'express';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -18,6 +18,7 @@ export class AuthGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    const response = context.switchToHttp().getResponse<Response>();
 
     const authorizationHeader = request.headers.authorization;
     if (!authorizationHeader)
@@ -59,6 +60,7 @@ export class AuthGuard implements CanActivate {
         });
 
         response.setHeader('Authorization', `Bearer ${tokens.accessToken}`);
+        return true;
       }
 
       throw new UnauthorizedException({

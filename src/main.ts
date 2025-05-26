@@ -14,6 +14,7 @@ async function bootstrap() {
     origin: 'http://localhost:5173', // Заменить потом на .env
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Authorization'],
   });
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(cookieParser());
