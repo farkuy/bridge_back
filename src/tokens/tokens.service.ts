@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TokensRepository } from './tokens.repository';
 import { User } from '../users/users.entity';
 import { JwtService } from '@nestjs/jwt';
@@ -41,6 +41,30 @@ export class TokensService {
       refreshToken: refreshHash,
     });
     return this.tokensRepository.save(token);
+  }
+
+  async updateToken(userId: number, refreshToken: string) {
+    const token = await this.tokensRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
+    if (!token)
+      throw new HttpException(
+        'Не найден токен пользователя',
+        HttpStatus.FORBIDDEN,
+      );
+
+    const isValidToken = await bcrypt.compare(refreshToken, token.refreshToken);
+    if (!isValidToken)
+      throw new HttpException(
+        'Токены не совпали. Авторизуйтесь еще раз.',
+        HttpStatus.FORBIDDEN,
+      );
+
+    const tokens = await this.generateTokens(token.user);
+    await this.saveToken(token.user.id, tokens.refreshToken);
+
+    return tokens;
   }
 
   private async hashToken(refreshToken: string): Promise<string> {

@@ -28,7 +28,6 @@ export class AuthController {
       sameSite: 'strict',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
-    console.log(other);
 
     return plainToInstance(UserResponseDto, other, {
       excludeExtraneousValues: true,

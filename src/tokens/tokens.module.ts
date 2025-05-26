@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TokensService } from './tokens.service';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -14,7 +14,7 @@ import { TokensRepository } from './tokens.repository';
       global: true,
       secret: process.env.SECRET_KEY,
     }),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   exports: [TokensService],
 })

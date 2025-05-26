@@ -10,7 +10,11 @@ async function bootstrap() {
   const PORT = process.env.PORT || 8080;
 
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:5173', // Заменить потом на .env
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  });
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(cookieParser());
   app.setGlobalPrefix('api');
