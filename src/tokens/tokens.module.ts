@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import * as process from 'process';
 import { UsersModule } from '../users/users.module';
 import { TokensRepository } from './tokens.repository';
+import { TokensController } from './tokens.controller';
 
 @Module({
   providers: [TokensService, TokensRepository],
@@ -17,5 +18,6 @@ import { TokensRepository } from './tokens.repository';
     forwardRef(() => UsersModule),
   ],
   exports: [TokensService],
+  controllers: [TokensController],
 })
 export class TokensModule {}

@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { TokensRepository } from './tokens.repository';
 import { User } from '../users/users.entity';
 import { JwtService } from '@nestjs/jwt';
@@ -43,9 +48,28 @@ export class TokensService {
     return this.tokensRepository.save(token);
   }
 
-  async updateToken(userId: number, refreshToken: string) {
+  async updateToken(refreshToken: string, authorizationHeader?: string) {
+    if (!authorizationHeader)
+      throw new HttpException(
+        'Нет заголовка авторизации',
+        HttpStatus.FORBIDDEN,
+      );
+
+    const [Bearer, jwtToken] = authorizationHeader.split(' ');
+    if (Bearer !== 'Bearer' || !jwtToken)
+      throw new UnauthorizedException({
+        message: 'Не авторизованный пользователь',
+      });
+
+    const user = await this.jwtService.decode(jwtToken);
+    if (!user)
+      throw new HttpException(
+        'Не удалось получить метаданные пользователя',
+        HttpStatus.FORBIDDEN,
+      );
+
     const token = await this.tokensRepository.findOne({
-      where: { user: { id: userId } },
+      where: { user: { id: user.id } },
       relations: ['user'],
     });
     if (!token)

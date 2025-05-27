@@ -6,19 +6,13 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { TokensService } from '../tokens/tokens.service';
-import { Response } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService,
-    private tokensService: TokensService,
-  ) {}
+  constructor(private jwtService: JwtService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const response = context.switchToHttp().getResponse<Response>();
 
     const authorizationHeader = request.headers.authorization;
     if (!authorizationHeader)
@@ -37,34 +31,8 @@ export class AuthGuard implements CanActivate {
       request.user = this.jwtService.verify(token);
       return true;
     } catch (error) {
-      const refreshToken = request.cookies['refreshToken'];
-
-      const userInfo = this.jwtService.decode(token);
-      if (!userInfo)
-        throw new HttpException(
-          'Не удалось получить метаданные пользователя',
-          HttpStatus.FORBIDDEN,
-        );
-
-      if (error instanceof TokenExpiredError) {
-        const tokens = await this.tokensService.updateToken(
-          userInfo.id,
-          refreshToken,
-        );
-
-        response.cookie('refreshToken', tokens.refreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
-
-        response.setHeader('Authorization', `Bearer ${tokens.accessToken}`);
-        return true;
-      }
-
       throw new UnauthorizedException({
-        message: 'Не авторизованный пользователь',
+        message: 'окен невалиден или истёк',
       });
     }
   }
