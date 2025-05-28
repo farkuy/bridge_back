@@ -61,7 +61,9 @@ export class TokensService {
         message: 'Не авторизованный пользователь',
       });
 
-    const user = await this.jwtService.decode(jwtToken);
+    const user = await this.jwtService.verify(jwtToken, {
+      ignoreExpiration: true,
+    });
     if (!user)
       throw new HttpException(
         'Не удалось получить метаданные пользователя',
