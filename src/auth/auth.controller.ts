@@ -53,8 +53,6 @@ export class AuthController {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    return plainToInstance(UserResponseDto, other, {
-      excludeExtraneousValues: true,
-    });
+    return plainToInstance(UserResponseDto, other);
   }
 }

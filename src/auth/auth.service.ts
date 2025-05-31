@@ -45,7 +45,6 @@ export class AuthService {
 
     return {
       ...user,
-      roles: Object.values(user.roles),
       ...tokens,
     };
   }
