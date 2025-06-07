@@ -9,6 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../roles/roles.entity';
 import { Token } from '../tokens/token.entity';
+import { Chat } from '../chat/chat.entity';
 
 @Entity()
 export class User {
@@ -54,4 +55,8 @@ export class User {
 
   @OneToOne(() => Token, (tokens) => tokens.user)
   refreshToken: Token;
+
+  @ManyToMany(() => Chat, (chat) => chat.users)
+  @JoinTable()
+  chats: Chat[];
 }

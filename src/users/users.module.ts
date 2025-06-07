@@ -7,10 +7,11 @@ import { Role } from '../roles/roles.entity';
 import { RolesModule } from '../roles/roles.module';
 import { UsersRepository } from './user.repository';
 import { TokensModule } from '../tokens/tokens.module';
+import { Chat } from '../chat/chat.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role]),
+    TypeOrmModule.forFeature([User, Role, Chat]),
     RolesModule,
     forwardRef(() => TokensModule),
   ],

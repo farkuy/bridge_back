@@ -8,10 +8,14 @@ import { RolesModule } from './roles/roles.module';
 import { Role } from './roles/roles.entity';
 import { TokensModule } from './tokens/tokens.module';
 import { Token } from './tokens/token.entity';
+import { ChatController } from './chat/chat.controller';
+import { ChatService } from './chat/chat.service';
+import { ChatModule } from './chat/chat.module';
+import { Chat } from './chat/chat.entity';
 
 @Module({
-  controllers: [],
-  providers: [],
+  controllers: [ChatController],
+  providers: [ChatService],
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
@@ -21,13 +25,14 @@ import { Token } from './tokens/token.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, Role, Token],
+      entities: [User, Role, Token, Chat],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
     RolesModule,
     TokensModule,
+    ChatModule,
   ],
 })
 export class AppModule {}
